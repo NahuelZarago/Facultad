@@ -9,44 +9,65 @@
 #c. utilizar una pila para almacenar temporáneamente las notificaciones 
 # producidas entre las 11:43 y las 15:57, y determinar cuántas son.
 
-cola = [
-    ("09:00", "Facebook", "Mensaje de mi amigo"),
-    ("9:30", "Instagram", "Nueva post de mi amigo"),
-    ("10:00", "WhatsApp", "Mensaje de mi amigo para estudiar"),
-    ("11:00", "Facebook", "Historia que subio mi amigo"),
-    ("11:48", "Twitter", "Cursito de Python creado por mi amigo"),
-    ("13:00", "Facebook", "Mensajito de mi amigo"),
-    ("15:30", "Instagram" "Nueva publicacion de mi amigo"),
-    #Hacia de todo mi amigo jaja
+
+import queue  
+import stack
+
+
+class Notificacion:
+    def __init__(self, hora: str, app: str, mensaje: str):
+        self.hora = hora
+        self.app = app
+        self.mensaje = mensaje
+
+    def __str__(self):
+        return f"{self.hora} - {self.app} - {self.mensaje}"
+
+notificaciones = [
+    Notificacion("09:00", "Facebook", "Mensaje de mi amigo"),
+    Notificacion("09:30", "Instagram", "Nueva post de mi amigo"),
+    Notificacion("10:00", "WhatsApp", "Mensaje de mi amigo para estudiar"),
+    Notificacion("11:00", "Facebook", "Historia que subió mi amigo"),
+    Notificacion("11:48", "Twitter", "Cursito de Python creado por mi amigo"),
+    Notificacion("13:00", "Facebook", "Mensajito de mi amigo"),
+    Notificacion("15:30", "Instagram", "Nueva publicación de mi amigo"),
 ]
 
+cola_notis = queue.Queue()
+for noti in notificaciones:
+    cola_notis.arrive(noti)
+
 #a
-def eliminarFacebook(cola):
-  nueva_cola = []
-  for noti_cola in cola:
-    if noti_cola[1] != "Facebook":
-      nueva_cola.append(noti_cola)
-  return nueva_cola
+def eliminar_facebook(cola: queue.Queue):
+    for i in range(cola.size()):
+        if cola.on_front().app != "Facebook":
+            cola.move_to_end()
+        else:
+            cola.attention()
+#b
+def mostrar_twitter_python(cola: queue.Queue):
+    for i in range(cola.size()):
+        noti = cola.on_front()
+        if noti.app == "Twitter" and "Python" in noti.mensaje:
+            print(noti)
+        cola.move_to_end()
+#c
+def notis_en_horario(cola: queue.Queue):
+    pila_horario = stack.Stack()
+    for i in range(cola.size()):
+        noti = cola.on_front()
+        if "11:43" < noti.hora < "15:57":
+            pila_horario.push(noti)
+        cola.move_to_end()
 
-#B
-def noti_twitter(cola):
-  for noti_cola in cola:
-    if noti_cola[1] == "Twitter" and "Python" in noti_cola[2]:
-      print(noti_cola)
+    print(f"Cantidad de notificaciones entre 11:43 y 15:57: {pila_horario.size()}")
 
-#C
-def pila(cola):
-  pilaVacia = []
-  for noti_cola in cola:
-    if "11:43" < noti_cola[0] < "15:57":
-      pilaVacia.append(noti_cola)
-  print(len(pilaVacia))     
-  
-  
-print("Cola sin facebook:")
-print(eliminarFacebook)
 
-print("notificaciones de twiter con python:")
-noti_twitter(cola)
-print()
-pila(cola)
+print("Notificaciones eliminadas")
+eliminar_facebook(cola_notis)
+notificaciones()
+print("Notificaciones de Twitter con 'Python' en el mensaje:")
+mostrar_twitter_python(cola_notis)
+print("Contando notificaciones entre 11:43 y 15:57:")
+notis_en_horario(cola_notis)
+

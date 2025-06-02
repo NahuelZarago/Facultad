@@ -12,87 +12,115 @@
 #f. determinar si el personaje Carol Danvers se encuentra en la cola e indicar 
 # su nombre de superhéroes.
 
-cola = [
+import queue
+
+class Personaje:
+    def __init__(self, nombre_personaje, nombre_heroe, genero):
+        self.nombre_personaje = nombre_personaje
+        self.nombre_heroe = nombre_heroe
+        self.genero = genero
+
+    def __str__(self):
+        return f"{self.nombre_personaje} / {self.nombre_heroe} / {self.genero}"
+
+
+personajes_data = [
     ("Tony Stark", "Iron Man", "M"),
     ("Steve Rogers", "Capitán América", "M"),
     ("Natasha Romanoff", "Black Widow", "F"),
     ("Carol Danvers", "Capitana Marvel", "F"),
     ("Scott Lang", "Ant-Man", "M"),
     ("Stephen Strange", "Doctor Strange", "M"),
-    ("Shuri", "Black Panther", "F")
+    ("Shuri", "Black Panther", "F"),
 ]
 
-#a
-def determinar_Capitana_Marvel(cola):
-  for especificaciones in cola:
-    if especificaciones[1] == "Capitana Marvel":
-        return especificaciones[0]
-  return "No se encontro la capitana marvel"
-      
+
+cola_personajes = queue.Queue()
+
+for nombre_personaje, nombre_heroe, genero in personajes_data:
+    cola_personajes.arrive(Personaje(nombre_personaje, nombre_heroe, genero))
+
+
+def mostrar_cola(cola: queue.Queue):
+    size = cola.size()
+    for i in range(size):
+        item = cola.on_front()
+        print(item)
+        cola.move_to_end()
+    print()
+
+#a 
+def nombre_personaje_capitana_marvel(cola: queue.Queue):
+    size = cola.size()
+    for i in range(size):
+        item = cola.on_front()
+        if item.nombre_heroe == "Capitana Marvel":
+            print(f"Personaje de Capitana Marvel: {item.nombre_personaje}")
+        cola.move_to_end()
+
 #b
-def Nombres_Femeninos(cola):
-  lista = []
-  for especificaciones in cola:
-    if especificaciones[2] == "F":
-        lista.append(especificaciones)
-  return lista
+def mostrar_heroes_femeninos(cola: queue.Queue):
+    print("Superheroes femeninos:")
+    size = cola.size()
+    for i in range(size):
+        item = cola.on_front()
+        if item.genero == "F":
+            print(item.nombre_heroe)
+        cola.move_to_end()
+    print()
 
 #c
-def Nombres_Masculinos(cola):
-  lista = []
-  for especificaciones in cola:
-    if especificaciones[2] == "M":
-      lista.append(especificaciones)
-  return lista
-      
+def mostrar_personajes_masculinos(cola: queue.Queue):
+    print("Personajes masculinos:")
+    size = cola.size()
+    for i in range(size):
+        item = cola.on_front()
+        if item.genero == "M":
+            print(item.nombre_personaje)
+        cola.move_to_end()
+    print()
+
 #d
-def Determinar_Scott_Lang(cola):
-  for especificaciones in cola:
-    if especificaciones[0] == "Scott Lang":
-      return especificaciones[1]
-  return "No se encontro a Scott Lang"
-      
+def heroe_de_scott_lang(cola: queue.Queue):
+    size = cola.size()
+    for i in range(size):
+        item = cola.on_front()
+        if item.nombre_personaje == "Scott Lang":
+            print(f"Superheroe de Scott Lang: {item.nombre_heroe}")
+        cola.move_to_end()
+
 #e
-def Nombres_S(cola):
-  lista = []  
-  for especificaciones in cola:
-    if especificaciones[0].startswith("S") or especificaciones[1].startswith("S"):
-      lista.append(especificaciones)
-  return lista 
+def mostrar_nombres_con_s(cola: queue.Queue):
+    print("Personajes o héroes que empiezan con 'S':")
+    size = cola.size()
+    for i in range(size):
+        item = cola.on_front()
+        if item.nombre_personaje.startswith("S") or item.nombre_heroe.startswith("S"):
+            print(item)
+        cola.move_to_end()
+    print()
 
-#f
-def Encontrar_Carol_Danvers(cola):
-  encontrado = False
-  for especificaciones in cola:
-    if especificaciones[0] == "Carol Danvers":
-      print("Carol Danvers esta en la cola y su superheroe es: ", especificaciones[1])
-      encontrado = True
-      break
-  if not encontrado:
-    print("Carol davers no esta en la lista")
-    
-#---------------------------------------------------------------------------------------    
-    
-print("El personaje de Capitana Marvel es:", determinar_Capitana_Marvel(cola))
-print()
+#d
+def buscar_carol_danvers(cola: queue.Queue):
+    size = cola.size()
+    encontrado = False
+    for i in range(size):
+        item = cola.on_front()
+        if item.nombre_personaje == "Carol Danvers":
+            print(f"Carol Danvers esta en la cola, su superheroe es: {item.nombre_heroe}")
+            encontrado = True
+        cola.move_to_end()
+    if not encontrado:
+        print("Carol Danvers no esta en la cola.")
 
-print("Los nombres de los superheroes femeninos son:")
-for especificaciones in Nombres_Femeninos(cola):
-    print(especificaciones[1])
-print()
 
-print("Los nombres de los personajes masculinos son:")
-for especificaciones in Nombres_Masculinos(cola):
-    print(especificaciones[0])
-print()
 
-print("El superheroe del personaje Scott Lang es:", Determinar_Scott_Lang(cola))
-print()
+mostrar_cola(cola_personajes)
 
-print("Personajes o superheroes que empiezan con S:")
-for especificaciones in Nombres_S(cola):
-  print(especificaciones[0], especificaciones[1], especificaciones[2])
-print()
-
-Encontrar_Carol_Danvers(cola)
+nombre_personaje_capitana_marvel(cola_personajes)
+mostrar_heroes_femeninos(cola_personajes)
+mostrar_personajes_masculinos(cola_personajes)
+heroe_de_scott_lang(cola_personajes)
+mostrar_nombres_con_s(cola_personajes)
+buscar_carol_danvers(cola_personajes)
 

@@ -13,60 +13,121 @@
 #f. mostrar los nombre de los trajes utilizados en las películas “Spider-Man: Homecoming” y
 #“Capitan America: Civil War”.
 
-pila_trajes = [
-    {"modelo": "Mark III", "pelicula": "Iron Man", "estado": "Dañado"},
-    {"modelo": "Mark XLIV", "pelicula": "Avengers: Age of Ultron", "estado": "Impecable"},
-    {"modelo": "Mark XLV", "pelicula": "Avengers: Age of Ultron", "estado": "Destruido"},
-    {"modelo": "Mark XLVI", "pelicula": "Captain America: Civil War", "estado": "Dañado"},
-    {"modelo": "Mark XLVII", "pelicula": "Spider-Man: Homecoming", "estado": "Impecable"},
-    {"modelo": "Mark L", "pelicula": "Avengers: Infinity War", "estado": "Destruido"},
-    {"modelo": "Mark LXXXV", "pelicula": "Avengers: Endgame", "estado": "Dañado"},
+import stack
+
+class Armadura:
+    def __init__(self, modelo: str, pelicula: str, estado: str):
+        self.modelo = modelo
+        self.pelicula = pelicula
+        self.estado = estado
+
+    def __str__(self):
+        return f"{self.modelo} - {self.pelicula} - {self.estado}"
+
+IronMan = stack.Stack()
+datos = [
+    ("Mark III", "Iron Man", "Dañado"),
+    ("Mark XLIV", "Avengers: Age of Ultron", "Impecable"),
+    ("Mark XLV", "Avengers: Age of Ultron", "Destruido"),
+    ("Mark XLVI", "Captain America: Civil War", "Dañado"),
+    ("Mark XLVII", "Spider-Man: Homecoming", "Impecable"),
+    ("Mark L", "Avengers: Infinity War", "Destruido"),
+    ("Mark LXXXV", "Avengers: Endgame", "Dañado"),
 ]
 
-#a
-def modelo_mark(pila):
-    peliculas = []
-    for traje in pila:
-        if traje["modelo"] == "Mark XLIV":
-            peliculas.append(traje["pelicula"])
-    if peliculas:
-        print(f'Mark XLIV fue usada en: {peliculas}')
-    else:
-        print('Mark XLIV no fue usada en ninguna película.')
+for modelo, pelicula, estado in datos:
+    IronMan.push(Armadura(modelo, pelicula, estado))
 
-#b 
-def dañados(pila):
-    dañaditos = []
-    for traje in pila:
-        if traje["estado"] == "Dañado":
-            dañaditos.append(f"{traje['modelo']} ({traje['pelicula']})")
-    print("Los modelos dañados son:")
-    for item in dañaditos:
-        print(f"- {item}")
+#a
+def modelo_mark(pila: stack.Stack):
+    aux = stack.Stack()
+    peliculas = []
+
+    while pila.size() > 0:
+        traje = pila.pop()
+        if traje.modelo == "Mark XLIV":
+            peliculas.append(traje.pelicula)
+        aux.push(traje)
+
+    while aux.size() > 0:
+        pila.push(aux.pop())
+
+    if peliculas:
+        print("Mark XLIV fue utilizada en:")
+        for peli in peliculas:
+            print(f"{peli}")
+    else:
+        print("Mark XLIV no fue utilizada en ninguna pelicula.")
+
+#b
+def mostrar_dañados(pila: stack.Stack):
+    aux = stack.Stack()
+    dañados = []
+
+    while pila.size() > 0:
+        traje = pila.pop()
+        if traje.estado == "Dañado":
+            dañados.append(f"{traje.modelo} ({traje.pelicula})")
+        aux.push(traje)
+
+    while aux.size() > 0:
+        pila.push(aux.pop())
+
+    print("Modelos dañados:")
+    for d in dañados:
+        print(f"{d}")
 
 #c
-def eliminar_destruidos(pila):
-    nueva_pila = []
+def eliminar_destruidos(pila: stack.Stack):
+    aux = stack.Stack()
     print("Modelos destruidos eliminados:")
-    for traje in pila:
-        if traje["estado"] == "Destruido":
-            print(f"- {traje['modelo']} ({traje['pelicula']})")
+
+    while pila.size() > 0:
+        traje = pila.pop()
+        if traje.estado == "Destruido":
+            print(f"{traje.modelo} ({traje.pelicula})")
         else:
-            nueva_pila.append(traje)
-    return nueva_pila
+            aux.push(traje)
+
+    while aux.size() > 0:
+        pila.push(aux.pop())
 
 #e
-def agregar_traje(pila, modelo, pelicula, estado):
-    for traje in pila:
-        if traje["modelo"] == modelo and traje["pelicula"] == pelicula:
-            print(f"No se puede agregar: {modelo} ya se encuentra en {pelicula}")
-            return
-    pila.append({"modelo": modelo, "pelicula": pelicula, "estado": estado})
-    print(f"{modelo} se agrego en {pelicula}")
+def agregar_traje(pila: stack.Stack, modelo: str, pelicula: str, estado: str):
+    aux = stack.Stack()
+    existe = False
+
+    while pila.size() > 0:
+        traje = pila.pop()
+        if traje.modelo == modelo and traje.pelicula == pelicula:
+            existe = True
+        aux.push(traje)
+
+    while aux.size() > 0:
+        pila.push(aux.pop())
+
+    if existe:
+        print(f"No se puede agregar: {modelo} porque ya se encuentra en {pelicula}")
+    else:
+        pila.push(Armadura(modelo, pelicula, estado))
+        print(f"{modelo} se agrego en {pelicula}")
 
 #f
-def mostrar_trajes_por_pelicula(pila, peliculas):
+def mostrar_trajes_por_pelicula(pila: stack.Stack, peliculas_objetivo: list):
+    aux = stack.Stack()
     print("Trajes usados en las peliculas indicadas:")
-    for traje in pila:
-        if traje["pelicula"] in peliculas:
-            print(f"- {traje['modelo']} en {traje['pelicula']}")
+
+    while pila.size() > 0:
+        traje = pila.pop()
+        if traje.pelicula in peliculas_objetivo:
+            print(f"{traje.modelo} en {traje.pelicula}")
+        aux.push(traje)
+
+    while aux.size() > 0:
+        pila.push(aux.pop())
+
+modelo_mark(IronMan)
+mostrar_dañados(IronMan)
+eliminar_destruidos(IronMan)
+agregar_traje(IronMan, "Mark LXXXV", "Avengers: Endgame", "Dañado")
+mostrar_trajes_por_pelicula(IronMan, ["Spider-Man: Homecoming", "Captain America: Civil War"])

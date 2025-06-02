@@ -8,55 +8,97 @@
 #c. determinar en cuantas películas participo la Viuda Negra (Black Widow);
 #d. mostrar todos los personajes cuyos nombre empiezan con C, D y G.
 
-pila = [
-    {"nombre": "Iron Man", "peliculas": 10},
-    {"nombre": "Black Widow", "peliculas": 8},
-    {"nombre": "Hulk", "peliculas": 7},
-    {"nombre": "Captain America", "peliculas": 9},
-    {"nombre": "Groot", "peliculas": 5},
-    {"nombre": "Rocket Raccoon", "peliculas": 6},
-    {"nombre": "Doctor Strange", "peliculas": 4},
-    {"nombre": "Gamora", "peliculas": 6},
-    {"nombre": "Drax", "peliculas": 6},
-    {"nombre": "Captain Marvel", "peliculas": 3},
+import stack
+
+class Personaje:
+    def __init__(self, nombre: str, peliculas: int):
+        self.nombre = nombre
+        self.peliculas = peliculas
+
+    def __str__(self):
+        return f"{self.nombre} - {self.peliculas} peliculas"
+
+
+pila_marvel = stack.Stack()
+personajes = [
+    ("Iron Man", 10),
+    ("Black Widow", 8),
+    ("Hulk", 7),
+    ("Captain America", 9),
+    ("Groot", 5),
+    ("Rocket Raccoon", 6),
+    ("Doctor Strange", 4),
+    ("Gamora", 6),
+    ("Drax", 6),
+    ("Captain Marvel", 3),
 ]
 
+for nombre, pelis in personajes:
+    pila_marvel.push(Personaje(nombre, pelis))
+
 #a
-def posicionpersonajes(pila):
-    personajes_buscados = ["Rocket Raccoon", "Groot"]
-    for nombre in personajes_buscados:
-        posicion = None
-        for i in range(len(pila)-1, -1, -1):  
-            if pila[i]["nombre"] == nombre:
-                posicion = len(pila) - i  
-        if posicion is not None:
-            print(f"{nombre} esta en la posicion {posicion} desde la cima")
+def posicion_personajes(pila):
+    aux = stack.Stack()
+    posiciones = {}
+    pos_actual = 1
+
+    while pila.size() > 0:
+        personaje = pila.pop()
+        if personaje.nombre in ["Rocket Raccoon", "Groot"]:
+            posiciones[personaje.nombre] = pos_actual
+        aux.push(personaje)
+        pos_actual += 1
+
+    while aux.size() > 0:
+        pila.push(aux.pop())
+
+    for nombre in ["Rocket Raccoon", "Groot"]:
+        if nombre in posiciones:
+            print(f"{nombre} esta en la posicion {posiciones[nombre]} desde la cima.")
         else:
-            print(f"{nombre} no esta en la pila")
+            print(f"{nombre} no esta en la pila.")
+
 #b
 def personajes_mas_de_5(pila):
-    print("personajes con mas de 5 peliculas:")
-    for p in pila:
-        if p["peliculas"] > 5:
-            print(f"{p['nombre']} ({p['peliculas']} peliculas)")
-            
-            
+    aux = stack.Stack()
+    print("Personajes con mas de 5 peliculas:")
+    while pila.size() > 0:
+        p = pila.pop()
+        if p.peliculas > 5:
+            print(f"{p.nombre} ({p.peliculas} peliculas)")
+        aux.push(p)
+    while aux.size() > 0:
+        pila.push(aux.pop())
+
 #c
 def peliculas_black_widow(pila):
-    for p in pila:
-        if p["nombre"] == "Black Widow":
-            print(f"Black Widow participo en {p['peliculas']} peliculas")
-            return
-    print("Black Widow no esta en la pila")
-    
+    aux = stack.Stack()
+    encontrada = False
+    while pila.size() > 0:
+        p = pila.pop()
+        if p.nombre == "Black Widow":
+            print(f"Black Widow participo en {p.peliculas} peliculas.")
+            encontrada = True
+        aux.push(p)
+    while aux.size() > 0:
+        pila.push(aux.pop())
+    if not encontrada:
+        print("Black Widow no esta en la pila.")
+
 #d
 def personajes_por_letra(pila):
+    aux = stack.Stack()
     print("Personajes que empiezan con C, D o G:")
-    for p in pila:
-        if p["nombre"][0] in ["C", "D", "G"]:
-            print(f"{p['nombre']}")
+    while pila.size() > 0:
+        p = pila.pop()
+        if p.nombre[0] in ["C", "D", "G"]:
+            print(f"{p.nombre}")
+        aux.push(p)
+    while aux.size() > 0:
+        pila.push(aux.pop())
 
-posicionpersonajes(pila)
-personajes_mas_de_5(pila)
-peliculas_black_widow(pila)
-personajes_por_letra(pila)
+# 
+posicion_personajes(pila_marvel)
+personajes_mas_de_5(pila_marvel)
+peliculas_black_widow(pila_marvel)
+personajes_por_letra(pila_marvel)
