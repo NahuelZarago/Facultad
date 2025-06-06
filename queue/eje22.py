@@ -12,7 +12,7 @@
 #f. determinar si el personaje Carol Danvers se encuentra en la cola e indicar 
 # su nombre de superhéroes.
 
-import queue
+import queue_
 
 class Personaje:
     def __init__(self, nombre_personaje, nombre_heroe, genero):

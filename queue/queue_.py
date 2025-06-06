@@ -36,5 +36,5 @@ class Queue:  # Definicion de la clase Cola (primero en entrar, primero en salir
     
     def show(self):
         # Muestra todos los elementos en orden
-        for i in range(len(self.__elements)):
-            print(self.move_to_end())  # Imprime y rota cada elemento una vez
+        for elem in self.__elements:
+            print(elem)  # Imprime y rota cada elemento una vez
