@@ -33,26 +33,26 @@ notificaciones = [
     Notificacion("15:30", "Instagram", "Nueva publicación de mi amigo"),
 ]
 
-cola_notis = queue.Queue()
+cola_notis = queue_.Queue()
 for noti in notificaciones:
     cola_notis.arrive(noti)
 
 #a
-def eliminar_facebook(cola: queue.Queue):
+def eliminar_facebook(cola: queue_.Queue):
     for i in range(cola.size()):
         if cola.on_front().app != "Facebook":
             cola.move_to_end()
         else:
             cola.attention()
 #b
-def mostrar_twitter_python(cola: queue.Queue):
+def mostrar_twitter_python(cola: queue_.Queue):
     for i in range(cola.size()):
         noti = cola.on_front()
         if noti.app == "Twitter" and "Python" in noti.mensaje:
             print(noti)
         cola.move_to_end()
 #c
-def notis_en_horario(cola: queue.Queue):
+def notis_en_horario(cola: queue_.Queue):
     pila_horario = stack.Stack()
     for i in range(cola.size()):
         noti = cola.on_front()

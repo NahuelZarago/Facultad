@@ -1,18 +1,18 @@
-num = int(input("Pone cualquier numero: "))
+#Implementar una función que permita obtener el valor 
+#en la sucesión de Fibonacci para un  
+#número dado de forma recursiva.
 
-def fibo(n):
-  #(Para ayudarme) si n vale 0 entonces devolverá 0 pero si vale 1 entonces devolverá 1
-  if n == 0:
-    return 0
-  if n == 1:
-    return 1
-  else:
-    a = 0
-    b = 1
-    for i in range(2, n + 1):
-      temp = a + b
-      a = b
-      b = temp
-    return b
-  
-print("El valor de Fibonacci en la posicion", num, "es:", fibo(num))
+def fibonacci(n: int) -> int:
+    if n <= 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci(n-1) + fibonacci(n-2)
+
+
+def mostrar_fibonacci(n):
+    for i in range(n):
+        print(fibonacci(i))
+
+mostrar_fibonacci(10)

@@ -1,3 +1,8 @@
+#Implementar una función que calcule la suma 
+#de todos los números enteros comprendidos  
+#entre cero y un número entero positivo dado de 
+#forma recursiva.
+
 num = int(input("Ingrese un numero positivo: "))
 
 def enteros(n):

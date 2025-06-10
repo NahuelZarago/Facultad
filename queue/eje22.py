@@ -35,13 +35,13 @@ personajes_data = [
 ]
 
 
-cola_personajes = queue.Queue()
+cola_personajes = queue_.Queue()
 
 for nombre_personaje, nombre_heroe, genero in personajes_data:
     cola_personajes.arrive(Personaje(nombre_personaje, nombre_heroe, genero))
 
 
-def mostrar_cola(cola: queue.Queue):
+def mostrar_cola(cola: queue_.Queue):
     size = cola.size()
     for i in range(size):
         item = cola.on_front()
@@ -50,7 +50,7 @@ def mostrar_cola(cola: queue.Queue):
     print()
 
 #a 
-def nombre_personaje_capitana_marvel(cola: queue.Queue):
+def nombre_personaje_capitana_marvel(cola: queue_.Queue):
     size = cola.size()
     for i in range(size):
         item = cola.on_front()
@@ -59,7 +59,7 @@ def nombre_personaje_capitana_marvel(cola: queue.Queue):
         cola.move_to_end()
 
 #b
-def mostrar_heroes_femeninos(cola: queue.Queue):
+def mostrar_heroes_femeninos(cola: queue_.Queue):
     print("Superheroes femeninos:")
     size = cola.size()
     for i in range(size):
@@ -70,7 +70,7 @@ def mostrar_heroes_femeninos(cola: queue.Queue):
     print()
 
 #c
-def mostrar_personajes_masculinos(cola: queue.Queue):
+def mostrar_personajes_masculinos(cola: queue_.Queue):
     print("Personajes masculinos:")
     size = cola.size()
     for i in range(size):
@@ -81,7 +81,7 @@ def mostrar_personajes_masculinos(cola: queue.Queue):
     print()
 
 #d
-def heroe_de_scott_lang(cola: queue.Queue):
+def heroe_de_scott_lang(cola: queue_.Queue):
     size = cola.size()
     for i in range(size):
         item = cola.on_front()
@@ -90,7 +90,7 @@ def heroe_de_scott_lang(cola: queue.Queue):
         cola.move_to_end()
 
 #e
-def mostrar_nombres_con_s(cola: queue.Queue):
+def mostrar_nombres_con_s(cola: queue_.Queue):
     print("Personajes o héroes que empiezan con 'S':")
     size = cola.size()
     for i in range(size):
@@ -101,7 +101,7 @@ def mostrar_nombres_con_s(cola: queue.Queue):
     print()
 
 #d
-def buscar_carol_danvers(cola: queue.Queue):
+def buscar_carol_danvers(cola: queue_.Queue):
     size = cola.size()
     encontrado = False
     for i in range(size):
