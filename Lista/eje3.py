@@ -7,7 +7,7 @@ lista.append(2)
 lista.append(3)
 lista.append(6)
 lista.append(5)
-x
+
 def dividir(lista):
     pares_lista = []
     impares_lista = []
