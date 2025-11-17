@@ -12,247 +12,177 @@
 # al servidor “MongoDB”;
 
 from graph import Graph
-import math
 
-#a cargamos la red con todos los tipos de nodos
-# Creamos grafo NO dirigido
-red = Graph(is_directed=False)
+# ============================================================
+#  GRAFO STAR WARS - NO DIRIGIDO
+# ============================================================
 
-# Diccionario de nodos con su tipo 
-equipos = {
-    "LaptopA": "notebook",
-    "LaptopB": "notebook",
-    "LaptopC": "notebook",
+grafo = Graph(is_directed=False)
 
-    "WorkPC": "pc",
-    "OfficePC": "pc",
-    "GamerPC": "pc",
-
-    "PrinterX": "impresora",
-
-    "Srvguarani": "servidor",
-    "SrvDatos": "servidor",
-
-    "Switch01": "switch",
-    "Switch02": "switch",
-
-    "RtAlpha": "router",
-    "RtBeta": "router",
-    "RtGamma": "router",
+# --- Datos de personajes + episodios donde aparecen ---
+personajes_info = {
+    "Luke Skywalker": [1,2,3,4,5,6,7,8,9],
+    "Darth Vader": [1,2,3,4,5,6],
+    "Yoda": [1,2,3,4,5,6,8],
+    "Boba Fett": [2,5,6],
+    "C-3PO": [1,2,3,4,5,6,7,8,9],
+    "Leia": [1,2,3,4,5,6,7,8,9],
+    "Rey": [7,8,9],
+    "Kylo Ren": [7,8,9],
+    "Chewbacca": [1,2,3,4,5,6,7,8,9],
+    "Han Solo": [1,2,3,4,5,6,7],
+    "R2-D2": [1,2,3,4,5,6,7,8,9],
+    "BB-8": [7,8,9]
 }
 
-# Insertamos cada vértice con su tipo dentro de "other_values"
-for nombre, tipo in equipos.items():
-    red.insert_vertex(nombre, {"tipo": tipo})
+# Insertar vértices
+for nombre in personajes_info.keys():
+    grafo.insert_vertex(nombre)
 
-
-
-# Lista con las aristas: origen, destino, peso
+# --- Aristas: cantidad de episodios compartidos ---
 conexiones = [
-    ("LaptopA", "Switch01", 10),
-    ("LaptopB", "Switch01", 15),
-    ("OfficePC", "Switch01", 22),
+    ("Luke Skywalker", "Darth Vader", 4),
+    ("Luke Skywalker", "Yoda", 3),
+    ("Luke Skywalker", "Leia", 6),
+    ("Luke Skywalker", "Han Solo", 5),
+    ("Luke Skywalker", "R2-D2", 7),
 
-    ("Switch01", "RtAlpha", 12),
+    ("Darth Vader", "Leia", 4),
+    ("Darth Vader", "Kylo Ren", 2),
 
-    ("RtAlpha", "RtBeta", 18),
-    ("RtBeta", "Srvguarani", 9),
-    ("RtAlpha", "LaptopC", 25),
+    ("Yoda", "C-3PO", 2),
+    ("Yoda", "Rey", 1),
 
-    ("RtBeta", "RtGamma", 14),
-    ("RtGamma", "Switch02", 30),
+    ("C-3PO", "R2-D2", 9),
+    ("C-3PO", "Leia", 7),
+    ("C-3PO", "Han Solo", 4),
 
-    ("Switch02", "WorkPC", 3),
-    ("Switch02", "GamerPC", 11),
-    ("Switch02", "PrinterX", 20),
-    ("Switch02", "SrvDatos", 5),
+    ("Han Solo", "Chewbacca", 9),
+    ("Han Solo", "Leia", 6),
+    ("Han Solo", "Kylo Ren", 1),
+
+    ("Rey", "BB-8", 3),
+    ("Rey", "Kylo Ren", 3),
+
+    ("BB-8", "R2-D2", 1)
 ]
 
-# Cargamos las aristas en el grafo de conexiones
+# Cargar aristas
 for o, d, w in conexiones:
-    red.insert_edge(o, d, w)
+    grafo.insert_edge(o, d, w)
 
-#funcion para reconstruir camino desde dijkstra 
-def reconstruir_camino(stack_path, destino):
-    # Esta función toma la pila que retorna dijkstra() y arma el camino final
+# ============================================================
+#  PRIM: Generar Árbol de Expansión Mínimo (MST)
+# ============================================================
 
-    camino = []
-    distancia = None
+def prim_mst(grafo, inicio):
+    visitados = set([inicio])
+    aristas_candidatas = []
 
-    # Recorremos la pila hasta vaciarla
-    while stack_path.size() > 0:
-        nodo, dist, pred = stack_path.pop()
+    origen = grafo.search(inicio)
+    for edge in origen.edges:
+        aristas_candidatas.append((inicio, edge.value, edge.other_value))
 
-        # Si encontramos el destino buscado
+    resultado = []
+
+    while len(visitados) < grafo.size():
+        aristas_candidatas.sort(key=lambda x: x[2])
+        mejor = None
+
+        for a in aristas_candidatas:
+            if a[1] not in visitados:
+                mejor = a
+                break
+
+        if mejor is None:
+            break
+
+        resultado.append(mejor)
+        nuevo = mejor[1]
+        visitados.add(nuevo)
+
+        nodo_nuevo = grafo.search(nuevo)
+        for edge in nodo_nuevo.edges:
+            if edge.value not in visitados:
+                aristas_candidatas.append((nuevo, edge.value, edge.other_value))
+
+    return resultado
+
+def mostrar_mst(personaje):
+    print(f"\n=== MST desde {personaje} ===")
+    mst = prim_mst(grafo, personaje)
+    for o, d, peso in mst:
+        print(f"{o} ---{peso}→ {d}")
+
+# ============================================================
+#  B) Máximo número de episodios compartidos
+# ============================================================
+
+def max_relacion(grafo):
+    maximo = 0
+    pares = []
+
+    for v in grafo:
+        for edge in v.edges:
+            if edge.weight > maximo:
+                maximo = edge.weight
+                pares = [(v.value, edge.value)]
+            elif edge.weight == maximo:
+                pares.append((v.value, edge.value))
+    return maximo, pares
+
+# ============================================================
+#  C) Caminos más cortos (Dijkstra del profe)
+# ============================================================
+
+def mostrar_camino(origen, destino):
+    stack = grafo.dijkstra(origen)
+
+    recorrido = []
+    costo = None
+
+    while stack.size() > 0:
+        nodo, dist, padre = stack.pop()
         if nodo == destino:
-            # Guardamos la distancia final solo la primera vez
-            if distancia is None:
-                distancia = dist
+            if costo is None:
+                costo = dist
+            recorrido.append(nodo)
+            destino = padre
 
-            # Agregamos el nodo actual al camino
-            camino.append(nodo)
+    recorrido.reverse()
 
-            # Saltamos al predecesor para seguir reconstruyendo
-            destino = pred
+    print(f"\nCamino más corto {origen} → {recorrido[-1]}:")
+    print(" -> ".join(recorrido), f"(costo: {costo})")
 
-    # Si no se encontró ruta, devolvemos vacío
-    if not camino:
-        return [], math.inf
+# ============================================================
+#  D) Personajes que aparecieron en los 9 episodios
+# ============================================================
 
-    # Invertimos la lista para que quede en orden origen hacia destino
-    camino.reverse()
-    return camino, distancia
+def personajes_nueve_eps(info):
+    return [p for p, eps in info.items() if len(eps) == 9]
 
+# ============================================================
+#  EJECUCIÓN (sin usar if __main__)
+# ============================================================
 
+# A) MST
+mostrar_mst("C-3PO")
+mostrar_mst("Yoda")
+mostrar_mst("Leia")
 
-#barrido solo por amplitud desde las notebooks 
-def barridos_notebooks(grafo):
-    # Se realizará busqueda en amplitud desde cada notebook
-    notebooks = ["LaptopA", "LaptopB", "LaptopC"]
+# B) Máxima relación
+print("\n=== Máximo número de episodios compartidos ===")
+maxi, pares = max_relacion(grafo)
+print("Valor máximo:", maxi)
+print("Pares:")
+for p in set(pares):
+    print("  ", p)
 
-    print("barrido de la red desde notebooks:\n")
+# C) Caminos más cortos
+mostrar_camino("C-3PO", "R2-D2")
+mostrar_camino("Yoda", "Darth Vader")
 
-    for nb in notebooks:
-        print(f"{nb}:")
-        grafo.amplitude_sweep(nb)   # Barrido en amplitud
-        print("")
-
-
-
-#c camino mas corto a impresora desde varias pcs
-def caminos_a_impresora(grafo):
-    # PCs/notebooks desde donde se quiere enviar a imprimir un archivo
-    pcs = ["WorkPC", "LaptopA", "GamerPC"]
-
-    destino = "PrinterX"
-    resultados = {}
-
-    for pc in pcs:
-        # Ejecutamos dijkstra desde cada PC
-        stack = grafo.dijkstra(pc)
-
-        # Reconstruimos el camino final hacia la impresora
-        camino, dist = reconstruir_camino(stack, destino)
-
-        # Guardamos los resultados
-        resultados[pc] = {"camino": camino, "distancia": dist}
-
-    return resultados
-
-#d arbol de expansion minima con kruskal 
-def mst_kruskal(grafo):
-    # Kruskal devuelve un string de aristas tipo: "A-B-10;C-D-5;..."
-    texto = grafo.kruskal("LaptopA")
-    total = 0
-
-    # Sumamos pesos del árbol
-    if isinstance(texto, str):
-        partes = texto.split(";")
-        for edge in partes:
-            if "-" in edge:
-                o, d, w = edge.split("-")
-                total += int(w)
-
-    return total, texto
-
-
-#e pc mas cercana a srvguarani
-def pc_mas_cercana_a_academico(grafo):
-    # Solo computadoras reales (no notebooks)
-    pcs = ["WorkPC", "OfficePC", "GamerPC"]
-
-    destino = "Srvguarani"
-
-    mejor_pc = None
-    mejor_dist = math.inf
-    mejor_camino = []
-
-    # Probamos cada PC
-    for pc in pcs:
-        stack = grafo.dijkstra(pc)
-        camino, dist = reconstruir_camino(stack, destino)
-
-        # Elegimos la distancia más corta
-        if dist < mejor_dist:
-            mejor_dist = dist
-            mejor_pc = pc
-            mejor_camino = camino
-
-    return {"pc": mejor_pc, "distancia": mejor_dist, "camino": mejor_camino}
-
-
-#f pc del switch mas cercana a srvdatos
-
-def pc_del_switch_mas_cercana_a_datos(grafo):
-    # Buscamos la posición del switch en el grafo
-    pos = grafo.search("Switch01", "value")
-    vecinos = grafo[pos].edges   # Aristas que salen del switch
-
-    candidatos = []
-
-    # Filtramos solo vecinos que sean PCs
-    for edge in vecinos:
-        nombre = edge.value
-        pos2 = grafo.search(nombre, "value")
-        data = grafo[pos2].other_values
-        tipo = data.get("tipo")
-
-        if tipo == "pc":
-            candidatos.append(nombre)
-
-    destino = "SrvDatos"
-
-    mejor_pc = None
-    mejor_dist = math.inf
-    mejor_camino = []
-
-    # Ejecutamos Dijkstra desde cada PC conectada
-    for pc in candidatos:
-        stack = grafo.dijkstra(pc)
-        camino, dist = reconstruir_camino(stack, destino)
-
-        # Elegimos la menor distancia
-        if dist < mejor_dist:
-            mejor_dist = dist
-            mejor_pc = pc
-            mejor_camino = camino
-
-    return {
-        "pc": mejor_pc,
-        "distancia": mejor_dist,
-        "camino": mejor_camino,
-        "candidatos": candidatos
-    }
-
-
-if __name__ == "__main__":
-
-    # Mostrar vértices cargados con su tipo
-    print("Tipos de dispositivos cargados ")
-    for v in red:
-        print(v.value, " tipo:", v.other_values["tipo"])
-
-    # Realizar BFS desde notebooks
-    barridos_notebooks(red)
-
-    # Mostrar caminos a impresora
-    print("Camino más corto a la impresora")
-    resultados = caminos_a_impresora(red)
-    for pc, info in resultados.items():
-        print(f"{pc}: camino = {info['camino']} | distancia = {info['distancia']}")
-
-    # Obtener y mostrar árbol de expansión mínima
-    print("Árbol de Expansión Mínima")
-    peso, texto = mst_kruskal(red)
-    print("Aristas:", texto)
-    print("Peso total:", peso)
-
-    # PC más cercana a Srvguarani
-    print("PC más cercana a Srvguaranidemico")
-    r = pc_mas_cercana_a_academico(red)
-    print(r)
-
-    # PC del Switch01 más cercana a SrvDatos
-    print("PC del Switch01 más cercana a SrvDatos ")
-    r = pc_del_switch_mas_cercana_a_datos(red)
-    print(r)
+# D) Personajes en los 9 episodios
+print("\n=== Personajes que aparecen en los 9 episodios ===")
+for p in personajes_nueve_eps(personajes_info):
+    print("  ", p)
