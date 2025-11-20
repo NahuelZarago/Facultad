@@ -14,9 +14,10 @@
 from graph import Graph
 import math
 
+#creo el grafo no dirigido (osea es bidireccional)
 red = Graph(is_directed=False)
 
-# Insertar equipos con nombre que incluye tipo
+# Insertar equipos con nombre y el tipo
 red.insert_vertex("Red Hat", {"tipo": "notebook"})
 red.insert_vertex("Debian", {"tipo": "notebook"})
 red.insert_vertex("Arch", {"tipo": "notebook"})
@@ -34,6 +35,7 @@ red.insert_vertex("Router2", {"tipo": "router"})
 red.insert_vertex("Router3", {"tipo": "router"})
 red.insert_vertex("Parrot", {"tipo": "pc"})
 
+#ahora cargo las conexiones entre los equipos con su peso (distancia en metros)
 conexiones = [
     ("Ubuntu", "Switch1", 18),
     ("Impresora", "Switch1", 22),
@@ -53,13 +55,13 @@ conexiones = [
     ("Switch2", "MongoDB", 5)
     ]
 
-
+# Cargo las conexiones en el grafo
 for origen, destino, peso in conexiones:
     red.insert_edge(origen, destino, peso)
 
-
+#b creo la funcion para hacer los barridos en profundidad y amplitud
 def barridos_originales(grafo):
-    notebooks = ["Red Hat", "Debian", "Arch"]
+    notebooks = ["Red Hat", "Debian", "Arch"] 
     
     for notebook in notebooks:
         grafo.deep_sweep(notebook)
@@ -68,27 +70,27 @@ def barridos_originales(grafo):
     return print("Barridos completados")
 
 
-
+#c creo la funcion para obtener los caminos mas cortos a la impresora
 def obtener_caminos_impresora(grafo):
 
     pcs = ["Manjaro", "Red Hat", "Fedora"]    
     resultados = {}   
     
     for pc in pcs:
-        path = grafo.dijkstra(pc) #todos los caminos mas cortos a pc
+        path = grafo.dijkstra(pc) #usamos dijkstra para obtener todos los caminos mas cortos desde pc
         destination = 'Impresora'
         peso_total = None
         camino_completo = []
         
-        while path.size() > 0: #mientras que el path tenga algo, hace un pop al value
+        while path.size() > 0:
             value = path.pop()
-            if value[0] == destination: #chequea hasta que sea la impresora
+            if value[0] == destination: 
                 if peso_total is None:
-                    peso_total = value[1] #añade el peso
-                camino_completo.append(value[0]) #añade la impresora al camino
-                destination = value[2] #añade el predecesor de la impresora y vuelve a hacer esto
+                    peso_total = value[1] 
+                camino_completo.append(value[0]) 
+                destination = value[2] 
         
-        camino_completo.reverse() #Lo inverte para que sea de pc a impresora
+        camino_completo.reverse() #Invertimos una vez que encuentre la pc para que sea de pc a impresora
 
         resultados[pc] = { #Aca construye el camino
             "camino": camino_completo,
@@ -97,36 +99,36 @@ def obtener_caminos_impresora(grafo):
     
     return resultados
 
-
+#d creo la funcion para obtener el arbol de expansion minima
 def arbolExpansion(arbol, vertice):
-    tree = arbol.kruskal(vertice)
+    tree = arbol.kruskal(vertice) #uso kruskal para obtener el arbol de expansion minima
     peso_total = 0
 
-    for edge in tree.split(';'):
+    for edge in tree.split(';'): #el split lo uso para separar las aristas
         origin, destination, weight = edge.split('-')
         print(f"Arista: {origin} - {destination}, Peso: {weight}")
         peso_total += int(weight)
 
     return peso_total
 
-
+#e creo la funcion para obtener los caminos mas cortos a Guarani
 def obtener_caminos_Guarani(grafo):
     pcs = ["Manjaro", "Parrot", "Fedora", "Ubuntu", "Mint"]    
     resultados = {}   
     
     for pc in pcs:
-        path = grafo.dijkstra(pc)  # Todos los caminos más cortos desde pc
+        path = grafo.dijkstra(pc)  # vuelvo a usar dijkstra para obtener todos los caminos más cortos desde pc 
         destination = 'Guarani'
         peso_total = None
         camino_completo = []
         
-        while path.size() > 0:  # Mientras que el path tenga algo, hace un pop al value
+        while path.size() > 0: 
             value = path.pop()
-            if value[0] == destination:  # Chequea hasta que sea Guarani
+            if value[0] == destination:  
                 if peso_total is None:
-                    peso_total = value[1]  # Añade el peso
-                camino_completo.append(value[0])  # Añade Guarani al camino
-                destination = value[2]  # Añade el predecesor de Guarani y vuelve a hacer esto
+                    peso_total = value[1]  #añado el peso
+                camino_completo.append(value[0])  
+                destination = value[2]  
         
         camino_completo.reverse()  # Lo invierte para que sea de pc a Guarani
 
@@ -137,24 +139,24 @@ def obtener_caminos_Guarani(grafo):
     
     return resultados
 
-
+#f creo la funcion para obtener los caminos mas cortos a MongoDB
 def obtener_caminos_MongoDB(grafo):
     pcs = ["Ubuntu", "Mint"]    
     resultados = {}   
     
     for pc in pcs:
-        path = grafo.dijkstra(pc)  # Todos los caminos más cortos desde pc
+        path = grafo.dijkstra(pc)  # vuelvo a usar dijkstra para obtener todos los caminos más cortos desde pc
         destination = 'MongoDB'
         peso_total = None
         camino_completo = []
         
-        while path.size() > 0:  # Mientras que el path tenga algo, hace un pop al value
+        while path.size() > 0: 
             value = path.pop()
-            if value[0] == destination:  # Chequea hasta que sea MongoDB
+            if value[0] == destination: 
                 if peso_total is None:
-                    peso_total = value[1]  # Añade el peso
-                camino_completo.append(value[0])  # Añade MongoDB al camino
-                destination = value[2]  # Añade el predecesor de MongoDB y vuelve a hacer esto
+                    peso_total = value[1] 
+                camino_completo.append(value[0])  
+                destination = value[2]  
         
         camino_completo.reverse()  # Lo invierte para que sea de pc a MongoDB
 
