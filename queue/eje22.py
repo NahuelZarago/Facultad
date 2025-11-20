@@ -60,7 +60,7 @@ def nombre_personaje_capitana_marvel(cola: queue_.Queue):
 
 #b
 def mostrar_heroes_femeninos(cola: queue_.Queue):
-    print("Superheroes femeninos:")
+    print("Superheroes femeninos:") 
     size = cola.size()
     for i in range(size):
         item = cola.on_front()

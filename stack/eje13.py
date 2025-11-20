@@ -43,14 +43,14 @@ def modelo_mark(pila: stack.Stack):
     aux = stack.Stack()
     peliculas = []
 
-    while pila.size() > 0:
-        traje = pila.pop()
+    while pila.size() > 0:   #traje es una variable temporal para almacenar el elemento que se saca de la pila (le llamo traje a la armadura)
+        traje = pila.pop()  
         if traje.modelo == "Mark XLIV":
             peliculas.append(traje.pelicula)
         aux.push(traje)
 
     while aux.size() > 0:
-        pila.push(aux.pop())
+        pila.push(aux.pop())  #reestablecemos la pila a exactamente como estaba 
 
     if peliculas:
         print("Mark XLIV fue utilizada en:")

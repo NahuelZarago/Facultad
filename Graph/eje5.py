@@ -13,13 +13,12 @@
 
 from graph import Graph
 
-# ============================================================
-#  GRAFO STAR WARS - NO DIRIGIDO
-# ============================================================
+
+
 
 grafo = Graph(is_directed=False)
 
-# --- Datos de personajes + episodios donde aparecen ---
+#  Datos de personajes + episodios donde aparecen 
 personajes_info = {
     "Luke Skywalker": [1,2,3,4,5,6,7,8,9],
     "Darth Vader": [1,2,3,4,5,6],
@@ -35,11 +34,11 @@ personajes_info = {
     "BB-8": [7,8,9]
 }
 
-# Insertar vértices
+# Insertar vertices
 for nombre in personajes_info.keys():
     grafo.insert_vertex(nombre)
 
-# --- Aristas: cantidad de episodios compartidos ---
+# Aristas: cantidad de episodios compartidos 
 conexiones = [
     ("Luke Skywalker", "Darth Vader", 4),
     ("Luke Skywalker", "Yoda", 3),
@@ -71,10 +70,8 @@ conexiones = [
 for o, d, w in conexiones:
     grafo.insert_edge(o, d, w)
 
-# ============================================================
-#  PRIM: Generar Árbol de Expansión Mínimo (MST)
-# ============================================================
 
+#genero el arbol de expansion minima con Prim
 def prim_mst(grafo, inicio):
     visitados = set([inicio])
     aristas_candidatas = []
@@ -109,15 +106,13 @@ def prim_mst(grafo, inicio):
     return resultado
 
 def mostrar_mst(personaje):
-    print(f"\n=== MST desde {personaje} ===")
+    print(f"MST desde {personaje}")
     mst = prim_mst(grafo, personaje)
     for o, d, peso in mst:
         print(f"{o} ---{peso}→ {d}")
 
-# ============================================================
-#  B) Máximo número de episodios compartidos
-# ============================================================
 
+#maximo número de episodios compartidos
 def max_relacion(grafo):
     maximo = 0
     pares = []
@@ -131,10 +126,8 @@ def max_relacion(grafo):
                 pares.append((v.value, edge.value))
     return maximo, pares
 
-# ============================================================
-#  C) Caminos más cortos (Dijkstra del profe)
-# ============================================================
 
+#Caminos más cortos (Dijkstra del profe)
 def mostrar_camino(origen, destino):
     stack = grafo.dijkstra(origen)
 
@@ -151,38 +144,33 @@ def mostrar_camino(origen, destino):
 
     recorrido.reverse()
 
-    print(f"\nCamino más corto {origen} → {recorrido[-1]}:")
+    print(f"Camino más corto {origen} → {recorrido[-1]}:")
     print(" -> ".join(recorrido), f"(costo: {costo})")
 
-# ============================================================
-#  D) Personajes que aparecieron en los 9 episodios
-# ============================================================
 
+#Personajes que aparecieron en los 9 episodios
 def personajes_nueve_eps(info):
     return [p for p, eps in info.items() if len(eps) == 9]
 
-# ============================================================
-#  EJECUCIÓN (sin usar if __main__)
-# ============================================================
 
-# A) MST
+
 mostrar_mst("C-3PO")
 mostrar_mst("Yoda")
 mostrar_mst("Leia")
 
-# B) Máxima relación
-print("\n=== Máximo número de episodios compartidos ===")
+
+print("Maximo número de episodios compartidos ")
 maxi, pares = max_relacion(grafo)
 print("Valor máximo:", maxi)
 print("Pares:")
 for p in set(pares):
     print("  ", p)
 
-# C) Caminos más cortos
+
 mostrar_camino("C-3PO", "R2-D2")
 mostrar_camino("Yoda", "Darth Vader")
 
-# D) Personajes en los 9 episodios
-print("\n=== Personajes que aparecen en los 9 episodios ===")
+
+print("Personajes que aparecen en los 9 episodios")
 for p in personajes_nueve_eps(personajes_info):
     print("  ", p)
