@@ -1,45 +1,49 @@
 from typing import Any, Optional
 
-from heap import HeapMin
-from list_ import List
-from queue_ import Queue
-from stack import Stack
+from heap import HeapMin         # Importa una estructura de montículo mínimo
+from list_ import List           # Importa una lista personalizada
+from queue_ import Queue         # Importa una cola personalizada
+from stack import Stack          # Importa una pila personalizada
 
-class Graph(List):
+class Graph(List):               # La clase Graph hereda de List
 
+    # Clase interna que representa un vértice del grafo
     class __nodeVertex:
 
         def __init__(self, value: Any, other_values: Optional[Any] = None):
-            self.value = value
-            self.edges = List()
-            self.edges.add_criterion('value', Graph._order_by_value)
-            self.edges.add_criterion('weight', Graph._order_by_weight)
-            self.other_values = other_values
-            self.visited = False
+            self.value = value                           # Valor del vértice
+            self.edges = List()                          # Lista de aristas del vértice
+            self.edges.add_criterion('value', Graph._order_by_value)  # Criterio de orden por valor
+            self.edges.add_criterion('weight', Graph._order_by_weight) # Criterio por peso
+            self.other_values = other_values             # Otros valores opcionales
+            self.visited = False                         # Marca para recorridos
         
         def __str__(self):
-            return str(self.value)
+            return str(self.value)                       # Representación en texto del vértice
     
+    # Clase interna que representa una arista del grafo
     class __nodeEdge:
 
         def __init__(self, value: Any, weight: Any, other_values: Optional[Any] = None):
-            self.value = value
-            self.weight = weight
-            self.other_values = other_values # no esta en uso aun
+            self.value = value                           # Nodo destino
+            self.weight = weight                         # Peso de la arista
+            self.other_values = other_values             # Extra (no usado aún)
         
         def __str__(self):
             return f'Destination: {self.value} with weight --> {self.weight}'
     
     def __init__(self, is_directed=False):
-        self.add_criterion('value', self._order_by_value)
-        self.is_directed = is_directed
+        self.add_criterion('value', self._order_by_value) # Criterio de orden para los vértices
+        self.is_directed = is_directed                   # Si el grafo es dirigido o no
 
+    # Métodos para ordenar por valor o peso
     def _order_by_value(item):
         return item.value
 
     def _order_by_weight(item):
         return item.weight
     
+    # Muestra todos los vértices y sus aristas
     def show(
         self
     ) -> None:
@@ -47,25 +51,29 @@ class Graph(List):
             print(f"Vertex: {vertex}")
             vertex.edges.show() 
 
+    # Inserta un vértice en el grafo
     def insert_vertex(
         self,
         value: Any,
-      other_values: Optional[Any] = None) -> None:  #Añadido el other_values
-        node_vertex = Graph.__nodeVertex(value, other_values)
+        other_values: Optional[Any] = None) -> None:
+        node_vertex = Graph.__nodeVertex(value, other_values) 
         self.append(node_vertex)
 
+    # Inserta una arista entre dos vértices
     def insert_edge(self, origin_vertex: Any, destination_vertex: Any, weight: int) -> None:
-        origin = self.search(origin_vertex, 'value')
-        destination = self.search(destination_vertex, 'value')
+        origin = self.search(origin_vertex, 'value')          # Busca origen
+        destination = self.search(destination_vertex, 'value')# Busca destino
         if origin is not None and destination is not None:
             node_edge = Graph.__nodeEdge(destination_vertex, weight)
             self[origin].edges.append(node_edge)
+            # Si el grafo NO es dirigido, inserta también la arista inversa
             if not self.is_directed and origin != destination:
                 node_edge = Graph.__nodeEdge(origin_vertex, weight)
                 self[destination].edges.append(node_edge)
         else:
             print('no se puede insertar falta uno de los vertices')
 
+    # Elimina una arista
     def delete_edge(
         self,
         origin,
@@ -75,12 +83,14 @@ class Graph(List):
         pos_origin = self.search(origin, key_value)
         if pos_origin is not None:
             edge = self[pos_origin].edges.delete_value(destination, key_value)
+            # Elimina la arista inversa si el grafo es no dirigido
             if not self.is_directed and edge is not None:
                 pos_destination = self.search(destination, key_value)
                 if pos_destination is not None:
                     self[pos_destination].edges.delete_value(origin, key_value)
             return edge
 
+    # Elimina un vértice y todas sus aristas asociadas
     def delete_vertex(
         self,
         value,
@@ -93,10 +103,12 @@ class Graph(List):
                 self.delete_edge(vertex.value, value, key_value_edges)
         return delete_value
 
+    # Marca todos los vértices como no visitados (para recorridos)
     def mark_as_unvisited(self) -> None:
         for vertex in self:
             vertex.visited = False
 
+    # Verifica si existe un camino entre dos vértices (DFS recursivo)
     def exist_path(self, origin, destination):
         def __exist_path(graph, origin, destination):
             result = False
@@ -119,6 +131,7 @@ class Graph(List):
         result = __exist_path(self, origin, destination)
         return result
     
+    # Recorrido en profundidad (DFS)
     def deep_sweep(self, value) -> None:
         def __deep_sweep(graph, value):
             vertex_pos = graph.search(value, 'value')
@@ -134,6 +147,7 @@ class Graph(List):
         self.mark_as_unvisited()
         __deep_sweep(self, value)
         
+    # Recorrido en amplitud (BFS)
     def amplitude_sweep(self, value)-> None:
         queue_vertex = Queue()
         self.mark_as_unvisited()
@@ -152,15 +166,16 @@ class Graph(List):
                                 self[destination_edge_pos].visited = True
                                 queue_vertex.arrive(self[destination_edge_pos])
 
+    # Algoritmo de Dijkstra — calcula caminos mínimos
     def dijkstra(self, origin):
         from math import inf
-        no_visited = HeapMin()
-        path = Stack()
+        no_visited = HeapMin()     # Heap para seleccionar el mínimo
+        path = Stack()             # Pila para guardar resultados
         for vertex in self:
             distance = 0 if vertex.value == origin else inf
             no_visited.arrive([vertex.value, vertex, None], distance)
         while no_visited.size() > 0:
-            value = no_visited.attention()
+            value = no_visited.attention()        # Extrae el de menor distancia
             costo_nodo_actual = value[0]
             path.push([value[1][0], costo_nodo_actual, value[1][2]])
             edges = value[1][1].edges
@@ -173,19 +188,21 @@ class Graph(List):
                             no_visited.change_priority(pos, costo_nodo_actual + edge.weight)
         return path
 
+    # Algoritmo de Kruskal — encuentra el árbol mínimo abarcador
     def kruskal(self, origin_vertex):
         def search_in_forest(forest, value):
             for index, tree in enumerate(forest):
                 if value in tree:
                     return index
                 
-        forest = []
-        edges = HeapMin()
+        forest = []                # Bosque inicial (cada vértice es un árbol)
+        edges = HeapMin()          # Heap de aristas ordenadas por peso
         for vertex in self:
             forest.append(vertex.value)
             for edge in vertex.edges:
                 edges.arrive([vertex.value, edge.value], edge.weight)
         
+        # Construcción del árbol abarcador mínimo
         while len(forest) > 1 and edges.size() > 0:
             edge = edges.attention()
             origin = search_in_forest(forest, edge[1][0])
@@ -198,7 +215,6 @@ class Graph(List):
                     else:
                         vertex_destination = forest.pop(destination)
                         vertex_origin = forest.pop(origin)
-
 
                     if '-' not in vertex_origin and '-' not in vertex_destination:
                         forest.append(f'{vertex_origin}-{vertex_destination}-{edge[0]}')
